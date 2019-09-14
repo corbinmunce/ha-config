@@ -24,9 +24,6 @@ homeassistant:
   whitelist_external_dirs:
     - '/share'
 
-# Show links to resources in log and frontend
-#introduction:
-
 # Enables the frontend
 frontend:
 
@@ -254,10 +251,10 @@ cloud:
       switch.stairs:
         display_categories: LIGHT
 
-vacuum:
-  - platform: xiaomi_miio
-    host: 192.168.5.105
-    token: !secret vacuum_token
+#vacuum:
+#  - platform: xiaomi_miio
+#    host: 192.168.5.105
+#    token: !secret vacuum_token
 
 
 switch:
