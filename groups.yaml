@@ -1,0 +1,209 @@
+default_view:
+  view: yes
+  icon: mdi:home
+  entities:
+    - group.livefront
+    - group.liveback
+    - group.lastmotion
+    - group.doorsensors
+    - group.motionsensors
+    - group.environment
+    - group.controlgroups
+    - group.corbin
+    - group.corbingroup
+    - group.times
+
+#times:
+#  name: time stuff
+#  entities:
+#    - sensor.date__time
+#    - sensor.time
+
+
+livefront:
+  name: Live Front
+  entities:
+    - camera.live_carport
+    - camera.live_driveway
+    - camera.live_front_door
+
+liveback:
+  name: Live Back
+  entities:
+    - camera.live_backyard
+    - camera.live_pool
+   # - camera.live_pests
+
+lastmotion:
+  name: Last
+  entities:
+    - camera.last_motion_carport
+    - camera.last_motion_front
+
+control_view:
+  name: Control
+  view: yes
+  entities:
+    - group.all_lights_view
+    - group.powerswitches
+    - group.wallswitches
+    - vacuum.xiaomi_vacuum_cleaner
+
+all_lights_view:
+  name: Lights
+  view: no
+  entities:
+    - light.workshop_1
+    - light.workshop_2
+    - light.bedroom_1
+    - light.bedroom_2
+    - light.bedroom_3
+    - light.bedroom_4
+    - light.bedroom_colour
+    - light.carport
+    - light.front
+    - light.gateway_light_34ce008bed8d
+    - light.gateway_light_f0b4299ae4b8
+    - light.kitchen
+    - light.lounge_colour_1
+    - light.lounge_colour_2
+    - light.lounge_colour_3
+    - light.lounge_colour_4
+    - light.lounge_colour_5
+    - light.lounge_colour_6
+    - light.lounge_colour_7
+    - light.strip
+    - light.toilet
+    - light.hall
+    - light.fast_led_white
+
+
+powerswitches:
+  name: Power Switches
+  view: no
+  entities:
+    - switch.projector
+    - switch.aircon
+    - switch.lg_tv_av12
+    - switch.lg_tv_hdmi12
+    - switch.lg_tv_hdmi3
+    - switch.lg_tv_power
+    - switch.original_xiaomi_mi_smart_wifi_socket
+    - switch.plug_158d00010ad681
+    - switch.plug_158d00010e080c
+    - switch.plug_158d00010ec40b # projector
+    - switch.plug_158d00010ec4b1
+    - switch.plug_158d00010ec4b3
+    - switch.plug_158d00010f8a88
+    - switch.plug_158d00011070b4
+    - switch.plug_158d00013e2383
+
+
+wallswitches:
+  name: Control Switches
+  view: no
+  entities:
+    - binary_sensor.switch_158d0000f92ff5
+    - binary_sensor.switch_158d0000fa61de
+    - binary_sensor.switch_158d000104ed67
+    - binary_sensor.wall_switch_158d0001831a9a
+    - binary_sensor.wall_switch_both_158d000183d3b7
+    - binary_sensor.wall_switch_left_158d000183d3b7
+    - binary_sensor.wall_switch_right_158d000183d3b7
+
+
+
+
+media:
+  name: Media
+  view: yes
+  #icon: mdi:play-circle-outline
+  entities:
+    - media_player.cellar_speaker
+    - media_player.home_group
+    - media_player.living_room_home
+    - media_player.sony
+    - media_player.sony_2
+    - media_player.mibox3
+    - media_player.sony_bravia_tv
+
+automation:
+  name: Automation
+  view: yes
+  entities:
+    - group.all_automations
+
+motionsensors:
+  name: Motion Sensors
+  entities:
+    - binary_sensor.motion_sensor_158d0000fa3efe
+    - binary_sensor.motion_sensor_158d0000fd32c2
+    - binary_sensor.motion_sensor_158d000103daee
+    - binary_sensor.motion_sensor_158d00010ab435
+    - binary_sensor.motion_sensor_158d00011c01ff
+    - binary_sensor.motion_sensor_158d0001292748
+    - binary_sensor.motion_sensor_158d00012932cf
+    - binary_sensor.motion_sensor_158d0001548b54
+    - binary_sensor.motion_sensor_158d0001d5c8fc
+    - binary_sensor.motion_sensor_158d000122febd
+    - binary_sensor.motion_sensor_158d0001d66c02
+
+doorsensors:
+  name: Door Sensors
+  entities:
+    - binary_sensor.door_window_sensor_158d000105b538
+    - binary_sensor.door_window_sensor_158d0001102269
+    - binary_sensor.door_window_sensor_158d000111eed3
+    - binary_sensor.door_window_sensor_158d00014e0538
+    - binary_sensor.door_window_sensor_158d000153725c
+    - binary_sensor.door_window_sensor_158d0001584059
+    - binary_sensor.door_window_sensor_158d00015842c3
+    - binary_sensor.door_window_sensor_158d00016d6e9b
+    - binary_sensor.door_window_sensor_158d0001a3e783
+
+
+
+environment:
+  name: Environment
+  entities:
+    - sensor.illumination_f0b4299ae4b8
+    - sensor.illumination_34ce008bed8d
+    - sensor.illumination_158d0001d5c8fc
+    - binary_sensor.smoke_sensor_158d0001536526
+    - sun.sun
+    - sensor.solaredge_live
+    - sensor.solaredge_today
+    - sensor.day_night
+    - sensor.red_value
+    - sensor.green_value
+    - sensor.blue_value
+    - sensor.light_brightness
+    - sensor.temperature_158d000273c264
+    - sensor.humidity_158d000273c264
+    - binary_sensor.vibration_158d0002b123bc
+
+controlgroups:
+  name: Control Groups
+  entities:
+    - light.lounge_lights
+    - light.outside_lights
+    - light.bedroom_lights
+    - light.workshop_lights
+
+Corbin:
+  name: Corbin
+  entities:
+    - device_tracker.04b16746f886
+
+
+
+mysensors:
+  name: My Sensors
+  entities:
+    - binary_sensor.motion_and_repeater_node_22_1
+    - binary_sensor.motion_sensor_5_1
+    - binary_sensor.motion_pm_bike_18_1
+    - binary_sensor.sensebender_micro_4_1
+    - binary_sensor.motion_pm_carport_20_1
+    - binary_sensor.motion_pm_frontdoor_19_1
+

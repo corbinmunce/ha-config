@@ -1,0 +1,1027 @@
+# Motion On Start #
+- alias: Motion Kitchen
+  trigger:
+    platform: state
+    entity_id: binary_sensor.motion_sensor_158d00010ab435
+    to: 'on'
+  action:
+    - service: light.turn_on
+      entity_id:
+        - light.lifx_d0_73_d5_29_0e_0a
+        - light.kitchen # light.lifx_26be36
+        - light.strip
+      data_template:
+        brightness: '{{ states.sensor.light_brightness.state }}' # '{{ (states.sensor.light_brightness.state | int) + 100 }}'
+        rgb_color: [255,255,255] # [255,241,224] # ['{{ states.sensor.red_value.state }}','{{ states.sensor.green_value.state }}','{{ states.sensor.blue_value.state }}']
+        transition: 1
+
+- alias: Motion Bedroom
+  trigger:
+    platform: state
+    entity_id: binary_sensor.motion_sensor_158d0001548b54
+    to: 'on'
+  action:
+    - service: light.turn_on
+      entity_id:
+        - light.bedroom_3
+        - light.bedroom_4
+      data_template:
+        brightness: '{{ states.sensor.light_brightness.state }}'
+
+- alias: Motion Front Bedroom
+  trigger:
+    platform: state
+    entity_id: binary_sensor.motion_sensor_158d000103daee
+    to: 'on'
+  action:
+    - service: light.turn_on
+      entity_id:
+        - light.bedroom_1
+        - light.bedroom_2
+      data_template:
+        brightness: '{{ states.sensor.light_brightness.state }}'
+
+- alias: Motion Toilet
+  trigger:
+    platform: state
+    entity_id: binary_sensor.motion_sensor_158d0000fd32c2
+    to: 'on'
+  action:
+    - service: light.turn_on
+      entity_id: light.toilet
+      data_template:
+        brightness: '{{ states.sensor.light_brightness.state }}'
+
+- alias: Motion Hallway
+  trigger:
+    platform: state
+    entity_id: binary_sensor.motion_sensor_158d0001292748
+    to: 'on'
+  action:
+    - service: light.turn_on
+      entity_id:
+        - light.hall
+        - light.lounge_lights
+      data_template:
+        brightness: '{{ states.sensor.light_brightness.state }}'
+        rgb_color: [255,241,224] # ['{{ states.sensor.red_value.state }}','{{ states.sensor.green_value.state }}','{{ states.sensor.blue_value.state }}']
+        transition: 3
+
+
+- alias: Motion Verandah
+  trigger:
+    platform: state
+    entity_id: binary_sensor.motion_sensor_158d0001d66c02
+    to: 'on'
+  condition:
+    - condition: state
+      entity_id: sensor.day_night
+      state: 'Night'
+  action:
+    - service: camera.snapshot
+      data:
+        entity_id: camera.live_pests
+        filename: '/share/snapshot_pests.jpg'
+    - delay: 00:00:04
+    - service: notify.telegram
+      data:
+        message: Motion at Verandah
+        data:
+          photo:
+            - file: '/share/snapshot_pests.jpg'
+    - delay: 00:00:10
+    - service: camera.snapshot
+      data:
+        entity_id: camera.live_pests
+        filename: '/share/snapshot_pests_02.jpg'
+    - delay: 00:00:04
+    - service: notify.telegram
+      data:
+        message: Motion at Verandah
+        data:
+          photo:
+            - file: '/share/snapshot_pests_02.jpg'
+    - delay: 00:00:10
+    - service: camera.snapshot
+      data:
+        entity_id: camera.live_pests
+        filename: '/share/snapshot_pests_03.jpg'
+    - delay: 00:00:04
+    - service: notify.telegram
+      data:
+        message: Motion at Verandah
+        data:
+          photo:
+            - file: '/share/snapshot_pests_03.jpg'
+
+- alias: Motion Front
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.motion_sensor_158d0001d5c8fc # Motion Front Aqara
+      to: 'on'
+    - platform: state
+      entity_id: binary_sensor.motion_sensor_158d00011c01ff # Motion Front Xiaomi
+      to: 'on'
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: binary_sensor.motion_sensor_158d00011c01ff # Motion Front Xiaomi
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.motion_sensor_158d0001d5c8fc # Motion Front Aqara
+        state: 'on'
+  action:
+    - service: light.turn_on
+      entity_id:
+        - light.front
+        - light.carport
+    - service: camera.snapshot
+      data:
+        entity_id: camera.live_front_door
+        filename: '/share/snapshot_front_door.jpg'
+    - delay: 00:00:04
+    - service: notify.telegram
+      data:
+        message: Motion at Front Door
+        data:
+          photo:
+            - file: '/share/snapshot_front_door.jpg'
+    - delay: 00:00:08
+    - service: camera.snapshot
+      data:
+        entity_id: camera.live_front_door
+        filename: '/share/snapshot_front_door_02.jpg'
+    - delay: 00:00:04
+    - service: notify.telegram
+      data:
+        message: Motion at Front Door
+        data:
+          photo:
+            - file: '/share/snapshot_front_door_02.jpg'
+
+- alias: Motion Carport
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.motion_sensor_158d000122febd # Motion Carport 2018
+      to: 'on'
+    - platform: state
+      entity_id: binary_sensor.motion_sensor_158d0001d66c02 # Xiaomi Motion Verandah
+      to: 'on'
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: binary_sensor.motion_sensor_158d0001d66c02 # Xiaomi Motion Verandah
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.motion_sensor_158d000122febd # Motion Carport 2018
+        state: 'on'
+  action:
+    - service: light.turn_on
+      entity_id:
+        - light.carport
+        - light.front
+    - service: camera.snapshot
+      data:
+        entity_id: camera.live_carport
+        filename: '/share/snapshot_carport.jpg'
+    - delay: 00:00:03
+    - service: notify.telegram
+      data:
+        message: Motion at carport
+        data:
+          photo:
+            - file: '/share/snapshot_carport.jpg'
+
+- alias: Motion Workshop
+  trigger:
+    platform: state
+    entity_id: binary_sensor.motion_sensor_158d00012932cf
+    to: 'on'
+  action:
+    - service: switch.turn_on
+      entity_id: switch.plug_158d00010ec4b3 # white led switch
+    - service: light.turn_on
+      entity_id:
+        - light.workshop_lights
+#    - delay: 00:00:08
+#    - service: light.turn_on
+#      entity_id:
+#        - light.fast_led_white
+#      data:
+#        effect: sinelon
+# Motion On End #
+
+# Motion Off Start #
+- alias: No Motion Hallway
+  trigger:
+    platform: state
+    entity_id: binary_sensor.motion_sensor_158d0001292748
+    to: 'off'
+    for:
+      minutes: 1
+  action:
+    - service: light.turn_off
+      entity_id:
+        - light.hall
+        - light.lounge_lights
+
+- alias: No Motion Front
+  trigger:
+    platform: state
+    entity_id: binary_sensor.motion_sensor_158d0001d5c8fc
+    to: 'off'
+    for:
+      minutes: 2
+  action:
+    - service: light.turn_off
+      entity_id:
+        - light.front
+        - light.carport
+    - delay: 00:01:00
+    - service: light.turn_off
+      entity_id:
+        - light.lounge_lights
+    - service: light.turn_off
+      entity_id:
+        - light.strip
+
+- alias: No Motion Kitchen
+  trigger:
+    platform: state
+    entity_id: binary_sensor.motion_sensor_158d00010ab435
+    to: 'off'
+    for:
+      minutes: 5
+  action:
+    - service: light.turn_off
+      entity_id:
+        - light.lifx_d0_73_d5_29_0e_0a
+        - light.kitchen # light.lifx_26be36
+        - light.strip
+
+- alias: No Motion Workshop
+  trigger:
+    platform: state
+    entity_id: binary_sensor.motion_sensor_158d00012932cf
+    to: 'off'
+  action:
+    - service: light.turn_off
+      entity_id:
+        - light.workshop_lights
+#    - delay: 00:03:30
+#    - service: light.turn_off
+#      entity_id:
+#        - light.fast_led_white
+#    - delay: 00:00:10
+#    - service: switch.turn_off
+#      entity_id: switch.plug_158d00010ec4b3 # white led switch
+
+- alias: No Motion Bedroom
+  trigger:
+    platform: state
+    entity_id: binary_sensor.motion_sensor_158d0001548b54
+    to: 'off'
+    for:
+      minutes: 1
+  action:
+    - service: light.turn_off
+      entity_id:
+        - light.bedroom_3
+        - light.bedroom_4
+
+- alias: No Motion Front Bedroom
+  trigger:
+    platform: state
+    entity_id: binary_sensor.motion_sensor_158d000103daee
+    to: 'off'
+    for:
+      minutes: 1
+  action:
+    - service: light.turn_off
+      entity_id:
+        - light.bedroom_1
+        - light.bedroom_2
+
+- alias: No Motion Toilet
+  trigger:
+    platform: state
+    entity_id: binary_sensor.motion_sensor_158d0000fd32c2
+    to: 'off'
+    for:
+      minutes: 3
+  action:
+    - service: light.turn_off
+      entity_id:
+        - light.toilet
+
+- alias: No Motion Carport
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.motion_sensor_158d000122febd
+      to: 'off'
+      for:
+        minutes: 2
+    - platform: state
+      entity_id: binary_sensor.motion_sensor_158d0001d66c02
+      to: 'off'
+      for:
+        minutes: 2
+  action:
+    - service: light.turn_off
+      entity_id:
+        - light.carport
+        - light.front
+# Motion Off End #
+
+# Door Start #
+- alias: Workshop Door Open
+  trigger:
+    platform: state
+    entity_id: binary_sensor.door_window_sensor_158d00016d6e9b
+    to: 'on'
+  condition:
+    - condition: state
+      entity_id: binary_sensor.motion_sensor_158d00012932cf
+      state: 'off'
+  action:
+    - service: light.turn_on
+      entity_id:
+        - light.workshop_lights
+    - delay: 00:00:08
+    - service: light.turn_on
+      entity_id:
+        - light.fast_led_white
+      data:
+        effect: sinelon
+
+#    - service: switch.turn_on
+#      entity_id: switch.plug_158d00010ec4b3 # white led switch
+
+- alias: Door Current Bedroom
+  trigger:
+    platform: state
+    entity_id: binary_sensor.door_window_sensor_158d0001584059
+    to: 'on'
+  action:
+    - service: light.turn_on
+      entity_id:
+        - light.bedroom_colour
+        #- light.strip
+      data_template:
+        brightness: '{{ states.sensor.light_brightness.state }}'
+        rgb_color: [255,241,224] # ['{{ states.sensor.red_value.state }}','{{ states.sensor.blue_value.state }}','{{ states.sensor.green_value.state }}']
+
+- alias: Back Door Open
+  trigger:
+    platform: state
+    entity_id: binary_sensor.door_window_sensor_158d000105b538
+    to: 'on'
+  condition:
+    - condition: state
+      entity_id: device_tracker.04b16746f886
+      state: 'not_home'
+  action:
+    - service: camera.snapshot
+      data:
+        entity_id: camera.live_pool
+        filename: '/share/snapshot_pool_01.jpg'
+    - delay: 00:00:04
+    - service: notify.telegram
+      data:
+        message: Back Door Open
+        data:
+          photo:
+            - file: '/share/snapshot_pool_01.jpg'
+
+- alias: Front Door Open
+  trigger:
+    platform: state
+    entity_id: binary_sensor.door_window_sensor_158d00014e0538
+    to: 'on'
+  action:
+    - service: camera.snapshot
+      data:
+        entity_id: camera.live_front_door
+        filename: '/share/snapshot_fd_01.jpg'
+    - delay: 00:00:04
+    - service: notify.telegram
+      data:
+        message: Front Door Open
+        data:
+          photo:
+            - file: '/share/snapshot_fd_01.jpg'
+# Door End #
+- alias: Vibration Bedroom
+  trigger:
+    platform: event
+    event_type: xiaomi_aqara.movement
+    event_data:
+      entity_id: binary_sensor.vibration_158d0002b123bc
+      movement_type: vibrate
+  action:
+    - service: light.turn_on
+      entity_id:
+        - light.bedroom_colour
+
+- alias: Vibration Bedroom Off
+  trigger:
+    platform: event
+    event_type: xiaomi_aqara.movement
+    event_data:
+      entity_id: binary_sensor.vibration_158d0002b123bc      
+  action:
+    - service: notify.telegram
+      data_template:
+        message: >
+          {{trigger.event.data}}
+
+
+
+
+
+# Movie
+- alias: Movie On
+  trigger:
+    platform: event
+    event_type: xiaomi_aqara.click
+    event_data:
+      entity_id: binary_sensor.wall_switch_both_158d000183d3b7
+  action:
+    - service: media_player.volume_set
+      data:
+        entity_id: media_player.living_room_home
+        volume_level: 0.4
+    - service: tts.google_say
+      entity_id: media_player.living_room_home
+      data:
+        message: 'MOVIE TIME ON!'
+    - service: switch.turn_on
+      entity_id: switch.Plug_158d00013e2383 # Xiaomi Mi Box Power
+    - service: switch.turn_on
+      entity_id: switch.plug_158d00010ec40b # Projector Power
+    - service: automation.turn_off
+      entity_id: automation.motion_hallway
+    - service: light.turn_on
+      entity_id:
+        - light.lounge_lights
+      data:
+        brightness: 10
+        rgb_color: [100,100,255]
+    - service: media_player.turn_on
+      entity_id: media_player.sony
+    - delay: 00:00:03
+    - service: media_player.select_source
+      data:
+        entity_id: media_player.sony
+        source: Audio in
+    - delay: 00:00:03
+    - service: media_player.volume_set
+      data:
+        entity_id: media_player.sony
+        volume_level: 0.7
+    - delay: 00:00:03
+    - service: switch.turn_on
+      entity_id: switch.projector
+    - delay: 00:01:40
+    - service: light.turn_off
+      entity_id: 
+        - light.hall
+        - light.lounge_lights
+
+- alias: Movie Off
+  trigger:
+    platform: event
+    event_type: xiaomi_aqara.click
+    event_data:
+      entity_id: binary_sensor.switch_158d000104ed67
+  action:
+    - service: light.turn_on
+      entity_id:
+        - light.lounge_lights
+      data:
+        brightness: 10
+        rgb_color: [100,100,255]
+    - service: notify.telegram
+      data_template:
+        message: turning off movie
+    - service: switch.turn_off
+      entity_id: switch.projector
+    - delay: 00:00:01
+    - service: switch.turn_off
+      entity_id: switch.projector
+    - delay: 00:00:05
+    - service: switch.turn_off
+      entity_id: switch.Plug_158d00013e2383 # Xiaomi Mi Box Power
+
+- alias: Movie Off 2
+  trigger:
+    platform: event
+    event_type: xiaomi_aqara.click
+    event_data:
+      entity_id: binary_sensor.switch_158d0000fa61de
+  action:
+    - service: light.turn_on
+      entity_id:
+        - light.lounge_lights
+      data:
+        brightness: 10
+        rgb_color: [100,100,255]
+    - service: notify.telegram
+      data_template:
+        message: turning off movie
+    - service: switch.turn_off
+      entity_id: switch.projector
+    - delay: 00:00:01
+    - service: switch.turn_off
+      entity_id: switch.projector
+    - delay: 00:00:05
+    - service: switch.turn_off
+      entity_id: switch.Plug_158d00013e2383 # Xiaomi Mi Box Power
+
+
+
+- alias: Lounge Lights On Switch
+  trigger:
+    platform: event
+    event_type: xiaomi_aqara.click
+    event_data:
+      entity_id: binary_sensor.wall_switch_right_158d000183d3b7
+  action:
+    - service: light.turn_on
+      entity_id:
+        - light.hall
+        - light.lounge_lights
+      data:
+        brightness: 255
+        rgb_color: [255,200,118]
+
+- alias: Lounge Lights Off Switch
+  trigger:
+    platform: event
+    event_type: xiaomi_aqara.click
+    event_data:
+      entity_id: binary_sensor.wall_switch_left_158d000183d3b7
+  action:
+    - service: light.turn_off
+      entity_id:
+        - light.hall
+        - light.lounge_lights
+
+
+
+
+- alias: PC Sony
+  trigger:
+    platform: event
+    event_type: xiaomi_aqara.click
+    event_data:
+      entity_id: binary_sensor.switch_158d0000f92ff5
+  action:
+    - service: media_player.turn_on
+      entity_id: media_player.sony
+    - delay: 00:00:02
+    - service: media_player.select_source
+      data:
+        entity_id: media_player.sony
+        source: USB DAC
+    - delay: 00:00:01
+    - service: media_player.volume_set
+      data:
+        entity_id: media_player.sony
+        volume_level: 0.6
+
+- alias: Projector Power On
+  trigger:
+    platform: numeric_state
+    entity_id: switch.plug_158d00010ec40b
+    value_template: '{{ state.attributes.load_power }}'
+    above: 5
+  action:
+    - service: notify.telegram
+      data_template:
+        message: projector power in use
+
+- alias: Projector Power Off
+  trigger:
+    platform: numeric_state
+    entity_id: switch.plug_158d00010ec40b
+    value_template: '{{ state.attributes.load_power }}'
+    below: 5
+    for:
+      minutes: 5
+  action:
+    - service: notify.telegram
+      data_template:
+        message: Projector power will be turned off in 5 minutes
+
+- alias: Projector Power Turn Off Switch
+  trigger:
+    platform: numeric_state
+    entity_id: switch.plug_158d00010ec40b
+    value_template: '{{ state.attributes.load_power }}'
+    below: 5
+    for:
+      minutes: 10
+  condition:
+    - condition: numeric_state
+      entity_id: switch.plug_158d00010ec40b
+      value_template: '{{ state.attributes.load_power }}'
+      below: 5
+  action:
+    - service: notify.telegram
+      data_template:
+        message: projector power has been turned off
+    - service: switch.turn_off
+      entity_id: switch.plug_158d00010ec40b
+    - service: automation.turn_on
+      entity_id: automation.motion_hallway
+    - delay: 00:00:30
+    - service: light.turn_off
+      entity_id:
+        - light.hall
+        - light.lounge_lights
+
+
+
+- alias: Leaving Home
+  trigger:
+    platform: state
+    entity_id: device_tracker.04b16746f886
+    to: 'not_home'
+  action:
+    - service: light.turn_off
+      entity_id: group.all_lights
+    - service: notify.telegram
+      data:
+        message: Leaving Home
+    - service: automation.turn_on
+      entity_id: automation.back_door_open
+    - service: automation.turn_on
+      entity_id: automation.motion_front
+
+- alias: Arriving Home
+  trigger:
+    platform: state
+    entity_id: device_tracker.04b16746f886
+    to: 'home'
+  action:
+    - service: light.turn_on
+      entity_id: group.all_lights
+    - service: notify.telegram
+      data:
+        message: Arriving Home
+    - service: automation.turn_off
+      entity_id: automation.back_door_open
+    - service: automation.turn_off
+      entity_id: automation.motion_front
+    - delay: 00:02:30
+    - service: light.turn_off
+      entity_id:
+        - light.hall
+        - light.lounge_lights
+
+
+
+
+- alias: Vacuum Power On
+  trigger:
+    platform: sun
+    event: sunrise
+    offset: '01:25:00'
+  action:
+    - service: switch.turn_on
+      entity_id: switch.plug_158d00010f8a88
+
+- alias: Vacuum Power Off
+  trigger:
+    platform: sun
+    event: sunset
+    offset: '-01:25:00'
+  action:
+    - service: switch.turn_off
+      entity_id: switch.plug_158d00010f8a88
+
+
+- alias: Excess Solar On
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.solaredge_live
+    value_template: '{{ states.sensor.solaredge_live.state | round(0) }}'
+    above: 600
+    for:
+      minutes: 10
+  condition:
+    - condition: state 
+      entity_id: switch.plug_158d00010e080c
+      state: 'off'
+  action:
+    - service: notify.telegram
+      data_template:
+        message: Excess solar power switching on
+    - service: switch.turn_on
+      entity_id: switch.plug_158d00010e080c
+
+- alias: Excess Solar Off
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.solaredge_live
+    value_template: '{{ states.sensor.solaredge_live.state | round(0) }}'
+    below: 400
+    for:
+      minutes: 10
+  condition:
+    - condition: state 
+      entity_id: switch.plug_158d00010e080c
+      state: 'on'
+  action:
+    - service: notify.telegram
+      data_template:
+        message: Excess solar power switching off
+    - service: switch.turn_off
+      entity_id: switch.plug_158d00010e080c
+
+
+
+- alias: Projector Power Turn Off Switch
+  trigger:
+    platform: numeric_state
+    entity_id: switch.plug_158d00010ec40b
+    value_template: '{{ state.attributes.load_power }}'
+    below: 5
+    for:
+      minutes: 10
+  condition:
+    - condition: numeric_state
+      entity_id: switch.plug_158d00010ec40b
+      value_template: '{{ state.attributes.load_power }}'
+      below: 5
+  action:
+    - service: notify.telegram
+      data_template:
+        message: projector power has been turned off
+    - service: switch.turn_off
+      entity_id: switch.plug_158d00010ec40b
+    - service: automation.turn_on
+      entity_id: automation.motion_hallway
+
+
+- alias: NBN Power Turn On Switch
+  trigger:
+    platform: state
+    entity_id: switch.Plug_158d00010ec4b3
+    to: 'off'
+    for: '00:01:00'
+  action:
+    - service: switch.turn_on
+      entity_id: switch.Plug_158d00010ec4b3
+    - service: notify.telegram
+      data_template:
+        message: NBN Power has been turned on
+
+
+- alias: Evening Lights On
+  trigger:
+    platform: sun
+    event: sunset
+    offset: '00:05:00'
+  action:
+    - service: light.turn_on
+      entity_id:
+        - light.lounge_colour_1
+        - light.lounge_colour_6
+        - light.kitchen # lifx_26be36
+      data:
+        brightness: 255
+        rgb_color: [255,200,118]
+
+- alias: Evening Lights Off
+  trigger:
+    platform: sun
+    event: sunset
+    offset: '01:05:00'
+  action:
+    - service: light.turn_off
+      entity_id:
+        - light.lounge_colour_1
+        - light.lounge_colour_6
+        - light.kitchen # lifx_26be36
+
+- alias: Morning Lights On
+  trigger:
+    platform: sun
+    event: sunrise
+    offset: '-00:15:00'
+  action:
+    - service: light.turn_on
+      entity_id:
+        - light.bedroom_1
+
+- alias: Morning Lights Off
+  trigger:
+    platform: sun
+    event: sunrise
+    offset: '00:05:00'
+  action:
+    - service: light.turn_off
+      entity_id:
+        - light.bedroom_1
+
+- alias: Wake Up Alarm
+  trigger:
+    platform: time
+    at: '04:50:00'
+  condition:
+  - condition: time
+    weekday:
+      - mon
+      - tue
+      - wed
+      - thu
+      - fri
+  action:
+    - service: light.turn_on
+      entity_id:
+        #- light.strip
+        - light.bedroom_colour
+    - service: switch.turn_off
+      entity_id: switch.plug_158d00011070b4
+
+- alias: Put out bin
+  trigger:
+    platform: time
+    at: '05:15:00'
+  condition:
+      condition: and
+      conditions:
+        - condition: time
+          weekday:
+            - tue
+  action:
+    - service: notify.telegram
+      data_template:
+        message: Put out bin
+
+- alias: Turn Off Motion Sensor
+  trigger:
+    platform: time
+    at: '21:00:00'
+  action:
+    - service: automation.turn_off
+      entity_id: automation.motion_hallway
+
+
+- alias: Turn On Motion Sensor
+  trigger:
+    platform: time
+    at: '04:00:00'
+  action:
+    - service: automation.turn_on
+      entity_id: automation.motion_hallway
+
+
+# turn on computer light, turn off motion off lights
+- alias: Working Home
+  trigger:
+    platform: time
+    at: '05:55:00'
+  condition:
+  - condition: time
+    weekday:
+      - mon
+      - tue
+      - wed
+      - thu
+      - fri
+  action:
+    - service: light.turn_on
+      entity_id:
+        - light.lounge_colour_5
+        - light.lounge_colour_6
+        - light.lounge_colour_7
+      data_template:
+        brightness: '{{ states.sensor.light_brightness.state }}'
+        rgb_color: [255,241,224]
+        transition: 3
+    - service: automation.turn_off
+      entity_id: automation.no_motion_hallway
+
+- alias: Bedroom Lights On Warning
+  trigger:
+    platform: state
+    entity_id: light.bedroom_colour
+    to: 'on'
+    for: '00:20:00'
+  action:
+    - service: notify.telegram
+      data_template:
+        message: Bedroom light has been left on
+
+- alias: Workshop Lights On Warning
+  trigger:
+    platform: state
+    entity_id: light.workshop_1, light.workshop_2
+    to: 'on'
+    for: '00:20:00'
+  action:
+    - service: notify.telegram
+      data_template:
+        message: Workshop light has been left on
+
+# Front Door
+- alias: Photo Front
+  trigger:
+    platform: homeassistant
+    event: start
+  action:
+    - service: camera.snapshot
+      data:
+        entity_id: camera.live_front_door
+        filename: '/share/snapshot_front_door.jpg'
+    - delay: 00:00:04
+    - service: notify.telegram
+      data:
+        message: Motion at Front Door
+        data:
+          photo:
+            - file: '/share/snapshot_front_door.jpg'
+
+
+
+- alias: HA Startup
+  trigger:
+    platform: homeassistant
+    event: start
+  action:
+    - delay: 00:00:25
+    - service: light.turn_on
+      entity_id:
+        - light.lounge_lights
+      data:
+        effect: WhatsApp
+    - service: media_player.volume_set
+      data:
+        entity_id: media_player.living_room_home
+        volume_level: 0.3
+    - service: tts.google_say
+      entity_id: media_player.living_room_home
+      data:
+        message: 'Home Assistant has started'
+    - delay: 00:00:03
+    - service: light.turn_off
+      entity_id:
+        - light.lounge_lights
+    - service: automation.turn_off
+      entity_id: automation.back_door_open
+    - service: automation.turn_off
+      entity_id: automation.morning_lights_on
+
+- alias: TV Sleep Timer
+  trigger:
+    platform: time
+    at: '21:30:00'
+  action:
+    - delay: 00:00:15
+    - service: media_player.turn_off
+      entity_id: media_player.sony_bravia_tv
+
+
+# Workout Start
+- alias: Workout Start
+  trigger:
+    platform: time
+    at: '18:59:00'
+  action:
+    - service: switch.turn_on
+      entity_id: switch.tv_lg
+    - service: light.turn_on
+      entity_id: light.strip
+    - service: automation.turn_off
+      entity_id: automation.motion_kitchen
+    - service: automation.turn_off
+      entity_id: automation.no_motion_kitchen
+    - delay: 00:00:45
+    - service: media_extractor.play_media
+      data:
+        entity_id: media_player.workout_tv
+        media_content_id: https://www.youtube.com/watch?v=D-JEa2jz0xI
+        media_content_type: video
+
+
+# media_player.workout_tv
+
+- alias: Workout Finish
+  trigger:
+    platform: time
+    at: '20:30:00'
+  action:
+    - service: switch.turn_off
+      entity_id: switch.tv_lg
+    - service: light.turn_off
+      entity_id: light.strip
+    - service: automation.turn_on
+      entity_id: automation.motion_kitchen
+    - service: automation.turn_on
+      entity_id: automation.no_motion_kitchen
+# Workout End

@@ -1,0 +1,439 @@
+# IP Ranges
+# Computers: 192.168.5.10-192.168.5.20
+# Mobiles/Tablets: 192.168.5.23-192.168.5.29
+# Xiaomi Gateways/Vacuums: 192.168.5.101-192.168.5.105
+# Google Home/Alexa/Chromecast: 192.168.5.110-192.168.5.120
+# Lights: 192.168.5.130-192.168.5.160
+
+
+homeassistant:
+  # Name of the location where Home Assistant is running
+  name: Home
+  # Location required to calculate the time the sun rises and sets
+  latitude: !secret latitude_home
+  longitude: !secret longitude_home
+  # Impacts weather/sunrise data (altitude above sea level in meters)
+  elevation: 43
+  # metric for Metric, imperial for Imperial
+  unit_system: metric
+  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  time_zone: Australia/Brisbane
+  # Customization file
+  customize: !include customize.yaml
+
+  whitelist_external_dirs:
+    - '/share'
+
+# Show links to resources in log and frontend
+#introduction:
+
+# Enables the frontend
+frontend:
+
+# Enables configuration UI
+config:
+
+logger:
+  default: info
+
+system_health:
+
+http:
+  # Uncomment this to add a password (recommended!)
+  # api_password: !secret http_password
+  # Uncomment this if you are using SSL/TLS, running in Docker container, etc.
+  server_port: 443
+  base_url: corbins.duckdns.org:443 #8123
+  ssl_certificate: /ssl/fullchain.pem
+  ssl_key: /ssl/privkey.pem
+
+
+# Checks for available updates
+# Note: This component will send some information about your system to
+# the developers to assist with development of Home Assistant.
+# For more information, please see:
+# https://home-assistant.io/blog/2016/10/25/explaining-the-updater/
+updater:
+  # Optional, allows Home Assistant developers to focus on popular components.
+  # include_used_components: true
+
+# Discover some devices automatically
+discovery:
+
+# Allows you to issue voice commands from the frontend in enabled browsers
+#conversation:
+
+# Enables support for tracking state changes over time
+#history:
+
+# View all events in a logbook
+#logbook:
+
+# Enables a map showing the location of tracked devices
+#map:
+
+media_extractor:
+
+# Track the sun
+sun:
+
+# Weather prediction
+#sensor:
+#  - platform: yr
+
+# Text to speech
+tts:
+  - platform: google_translate
+    service_name: google_say
+    language: 'en-au'
+
+media_player:
+  - platform: plex
+  - platform: songpal
+    name: SonySRSX99
+    endpoint: http://192.168.5.110:54480/sony
+  - platform: braviatv
+    host: 192.168.5.168
+
+
+telegram_bot:
+  - platform: polling
+    api_key: !secret telegram_key
+    allowed_chat_ids:
+      - !secret telegram_chat_id
+
+notify:
+  - name: telegram
+    platform: telegram
+    chat_id: !secret telegram_chat_id
+#  - name: mastodon
+#    platform: mastodon
+#    access_token: !secret mastodon_access_token
+#    client_id: !secret mastodon_client_id
+#    client_secret: !secret mastodon_client_secret
+
+
+
+sensor:
+#  - platform: miflora
+#    mac: '4B:F6:A8:31:ED:9C'
+#    name: miflora1
+#  - platform: miflora
+#    mac: '69:C3:FD:02:CC:4B'
+#    name: miflora2
+#  - platform: miflora
+#    mac: '54:AE:F3:5E:C4:2A'
+#    name: miflora3
+#  - platform: miflora
+#    mac: '03:12:54:5A:3D:E6'
+#    name: miflora4
+  - platform: solaredge_local
+    name: SolarEdgeLocal
+    ip_address: 192.168.5.21
+  - platform: time_date
+    display_options:
+      - 'time'
+      - 'date'
+      - 'date_time'
+      - 'time_date'
+      - 'time_utc'
+      - 'beat'
+  - platform: rest
+    resource: !secret solaredge_url
+    value_template: '{{ (value_json.overview.lastDayData.energy | float / 1000) | round(1) }}'
+    name: 'SolarEdge Today'
+    unit_of_measurement: 'kWh'
+    scan_interval: 900
+  - platform: rest
+    resource: !secret solaredge_url
+    value_template: '{{ value_json.overview.currentPower.power | round(1) }}'
+    name: 'SolarEdge Live'
+    unit_of_measurement: 'Watt'
+    scan_interval: 900
+  - platform: template
+    sensors:
+      day_night:
+        friendly_name: 'Time of Day'
+        entity_id: sensor.time
+        value_template: >-
+          {%- if now().hour >= 16 and now().hour < 21 %}
+          Evening
+          {% elif now().hour >= 21 or now().hour < 5 %}
+          Night
+          {% elif now().hour >= 5 and now().hour < 10 %}
+          Morning
+          {% else %}
+          Day
+          {%- endif %}
+      light_brightness:
+        friendly_name: 'Light Brightness'
+        entity_id: sensor.time
+        value_template: >-
+          {%- if now().hour >= 16 and now().hour < 21 %}
+          110
+          {% elif now().hour >= 21 or now().hour < 5 %}
+          1
+          {% elif now().hour >= 5 or now().hour < 8 %}
+          110
+          {% else %}
+          255
+          {%- endif %}
+      red_value:
+        friendly_name: 'Red Value'
+        entity_id: sensor.time
+        value_template: >-
+          {%- if now().hour > 3 and now().hour < 10 %}
+          255
+          {% else %}
+          {%- if now().weekday() >= 0 and now().weekday() < 2 %}
+          255
+          {% elif now().weekday() >= 2 and now().weekday() < 4 %}
+          0
+          {% elif now().weekday() >= 4 and now().weekday() < 6 %}
+          0
+          {% else %}
+          255
+          {%- endif %}
+          {%- endif %}
+      green_value:
+        friendly_name: 'Green Value'
+        entity_id: sensor.time
+        value_template: >-
+          {%- if now().hour > 3 and now().hour < 10 %}
+          255
+          {% else %}
+          {%- if now().weekday() >= 0 and now().weekday() < 2 %}
+          0
+          {% elif now().weekday() >= 2 and now().weekday() < 4 %}
+          255
+          {% elif now().weekday() >= 4 and now().weekday() < 6 %}
+          0
+          {% else %}
+          255
+          {%- endif %}
+          {%- endif %}
+      blue_value:
+        friendly_name: 'Blue Value'
+        entity_id: sensor.time
+        value_template: >-
+          {%- if now().hour > 3 and now().hour < 10 %}
+          255
+          {% else %}
+          {%- if now().weekday() >= 0 and now().weekday() < 2 %}
+          0
+          {% elif now().weekday() >= 2 and now().weekday() < 4 %}
+          0
+          {% elif now().weekday() >= 4 and now().weekday() < 6 %}
+          255
+          {% else %}
+          0
+          {%- endif %}
+          {%- endif %}
+
+xiaomi_aqara:
+  gateways:
+   - mac: !secret xiaomi_aqara_mac
+     key: !secret xiaomi_aqara_key
+   - mac: !secret xiaomi_aqara_mac2
+     key: !secret xiaomi_aqara_key2
+
+
+
+# Cloud
+cloud:
+  alexa:
+    filter:
+      include_entities:
+        - automation.movie_on
+      include_domains:
+        - switch
+    entity_config:
+      light.kitchen:
+        name: Custom Name for Alexa
+        description: The light in the kitchen
+      switch.stairs:
+        display_categories: LIGHT
+
+vacuum:
+  - platform: xiaomi_miio
+    host: 192.168.5.105
+    token: !secret vacuum_token
+
+
+switch:
+  - platform: broadlink
+    host: 192.168.5.106
+    mac: 'B4:43:0D:CC:2A:5B'
+    type: rm_mini
+    timeout: 15
+    switches:
+      tv_lg:
+        friendly_name: "LG TV Power"
+        command_on: 'JgBYAAABIJISExETETcSEhISEhQQFBETETcROBESEjcRNhM1EjcTNRMTERISNxEUERMSExE2EjYSNhM2EhIROBE3ETcREhITEgAFGwABH0oSAAwzAAEfShEADQU='
+        command_off: 'JgBYAAABIJISExETETcSEhISEhQQFBETETcROBESEjcRNhM1EjcTNRMTERISNxEUERMSExE2EjYSNhM2EhIROBE3ETcREhITEgAFGwABH0oSAAwzAAEfShEADQU='
+      tv_lg_hdmi1_hdmi2:
+        friendly_name: "LG TV HDMI12"
+        command_on: 'JgBIAAABIZMRExITEjYSExMRERURExEUEDkRNxEUEjYSNhM3ETcSNxITETgSNhI2ExMQExE4ETYSNxIUERMSExE4ETcRFBETEQANBQ=='
+        command_off: 'JgBQAAABJJMSEhISETgSEhITEBMSEhMSETcSNxMREjcSNxI3EjcSOBETERITNhM2EhITERM2EzcRNxI3ExISEhI3EjcRExETEgAFLQABJEoRAA0FAAAAAAAAAAA='
+      tv_lg_hdmi3:
+        friendly_name: "LG TV HDMI3"
+        command_on: 'JgBIAAABIZMSFBISETgRExEUERQQFBETEjcTNhMSETgRNxE3EjcROBM2ERMSFBE4ERMSNxM2EjUSFBE2ETgRExM2ExITEhATEwANBQ=='
+      tv_lg_av1_av2:
+        friendly_name: "LG TV AV12"
+        command_on: 'JgBIAAABIpQPFBITETgSEw8UEhQSEhEVDzgSOBAUETgQOQ84EjgRNxITETgSExA5EDgREhI3EhMROBMSEDkQFBETEjYTEhE4EQANBQ=='
+        command_off: 'JgBIAAABH5YPFBETETgUERAUEBURFBATETgROBEUETcSNxE4ETcSOBISEBUQFREUEjUSFBA5ETcRNxE4ETkQOBAUEjcRFRAUEQANBQ=='
+      aircon:
+        friendly_name: "Air Con"
+        command_on: 'JgC8AXQ3EQwPKg8NEA0PDRANDw0QDQ8NEA0PDRANDw0QKRANDw0QDQ8NEA0PDRANDyoQKRApEA0PDQ8qDw4PDQ8ODw0PDg8NEA0PDRANDw0QDQ8NEA0PDRANDw0QDQ8NEA0PDRANDw0QDQ8NEA0PDRANDw0QDQ8NECkQKRANDw0QDQ8NEA0PAAFHczgQDBApEA0PDRANDw4PDQ8NEA0PDg8NDw4PDQ8qEA0PDRANDw0QDQ8NEA0PKg8qDyoQDBANDyoQDBANDw0QDQ8NEA0PDRANDw0QDQ8NEA0PDRApEA0PDRApECkQKRANDw0QDQ8NEA0PDRANDyoQDBANDw0QDQ8NEA0PDRANDw0QKRApESgQKRApEA0PKhApEA0PKRANDyoQKRANDw0QDQ8NEA0PDRANDw0QDQ8NEA0PDRANDyoQKRAMEA0PDRANDw0QDQ8NEA0PDRANDyoQKRAMEA0PDRANDw0QDQ8NEA0PDRApEA0PDRANDw0QDQ8NEA0PKg8NEA0PDRANDw0QDQ8NEA0PDRANDw0QDQ8NEA0PDRANDyoQKRAMEA0PDg8NDw4PKRANEA0PKREMEA0PKg8qEAANBQAAAAAAAAAAAAAAAA=='
+        #command_off: 'JgC8AXQ3EQwPKg8NEA0PDRANDw0QDQ8NEA0PDRANDw0QKRANDw0QDQ8NEA0PDRANDyoQKRApEA0PDQ8qDw4PDQ8ODw0PDg8NEA0PDRANDw0QDQ8NEA0PDRANDw0QDQ8NEA0PDRANDw0QDQ8NEA0PDRANDw0QDQ8NECkQKRANDw0QDQ8NEA0PAAFHczgQDBApEA0PDRANDw4PDQ8NEA0PDg8NDw4PDQ8qEA0PDRANDw0QDQ8NEA0PKg8qDyoQDBANDyoQDBANDw0QDQ8NEA0PDRANDw0QDQ8NEA0PDRApEA0PDRApECkQKRANDw0QDQ8NEA0PDRANDyoQDBANDw0QDQ8NEA0PDRANDw0QKRApESgQKRApEA0PKhApEA0PKRANDyoQKRANDw0QDQ8NEA0PDRANDw0QDQ8NEA0PDRANDyoQKRAMEA0PDRANDw0QDQ8NEA0PDRANDyoQKRAMEA0PDRANDw0QDQ8NEA0PDRApEA0PDRANDw0QDQ8NEA0PKg8NEA0PDRANDw0QDQ8NEA0PDRANDw0QDQ8NEA0PDRANDyoQKRAMEA0PDg8NDw4PKRANEA0PKREMEA0PKg8qEAANBQAAAAAAAAAAAAAAAA=='
+        command_off: 'JgC8AXI5Dg4OKw4PDQ8ODw0PDRANDw4PDg4ODw0PDg8OKw4PDQ8ODg8ODg8NDw0QDSwOKw4rDg4ODw0sDg4ODw4ODg8ODg4PDQ8NEA0PDg8ODg0QDg0PDw0PDRANDw4PDQ8NEA4ODRAODg4PDg4NEA4ODg8NDw0QDisOKw4ODg8ODg8ODRANAAFJcToODg4rDg8NDw4PDg4ODw4ODg8ODg4PDQ8ODw4rDg4ODw4ODRANDw0QDg4OKw0tDSsODw4ODiwNDw4PDQ8NEA0PDg8ODg4PDg4ODw4ODRANDw4rDg8ODg4rDisOKw4PDg4ODw4ODRAODg0QDSwODg4PDg4ODw4ODg8ODg4PDg4OKw4rDg8NDw4PDQ8OKw4PDisODg4PDSwOKw4PDQ8ODw0PDg8ODg4PDQ8ODw4ODg8ODg4PDisOKw4ODg8ODg4PDg4ODw4ODg8ODg4PDisOKw4ODRAODg4PDg4ODw0PDg8ODg4rDg8NDw0QDQ8ODw0PDg8OKw4ODg8ODg4PDg4ODw4ODg8ODw4ODg8ODg4PDg4ODw0PDisOKw4PDg4NEA4ODg8NDw4rDg8OKw4rDisOKw0sDgANBQAAAAAAAAAAAAAAAA=='
+      projector:
+        friendly_name: "Projector"
+        command_on: 'JgDYAAABJpQSEhITEhMSExISEhMSExEUExIRExITExITNhE5EhISExI4EzYSNxI4EhMSEhI4EhMTERITEhMTEhI3EzcSEhI4EgAF+QABKJISExMSExETEhITEhMSExISExISExITERMSOBI3EhMSExI3EjgROBI3EhMSExI3EhMSExITEhISExI3EjgSExI3EgAF+gABJpQSExISEhMSExITEhISExITEhMSEhITEhMSNxI4EhMRExI4EjcSNxI4EhMSEhI4EhMSEhITEhMSExI3EjcSExI4EgANBQ=='
+        command_off: 'JgDYAAABJpMSExITEhMSEhITEhMSExISEhMSExISEhMSOBI3EhMSEhITEjgSNxI3EhMSExI3EhMSNxITEhMSExI3EjcSExI3EgAF+QABKJITEhMSExETEhQRExITERMSExITEhMRFBETNhQ2FBEUEBQRFDUUNhQ1FBEUERQ1FBEUNRQRFBEUEBQ2FDUUERQ1FAAF9gABKZEUERQRFBAUERQRFBEUEBQRFBEUERQQFBEUNRQ2FBEUEBQRFDYTNhQ1FBEUERQ1FBEUNRQRFBEUEBQ2FDUUERQ1FAANBQ=='
+
+yeelight:
+  devices:
+    192.168.5.141:
+      name: Workshop 1
+    192.168.5.142:
+      name: Workshop 2
+    192.168.5.134:
+      name: Toilet
+    192.168.5.145:
+      name: Bedroom 3
+    192.168.5.146:
+      name: Bedroom 4
+    192.168.5.136:
+      name: Carport
+    192.168.5.140:
+      name: Front
+    192.168.5.147:
+      name: Bedroom 1
+    192.168.5.144:
+      name: Bedroom 2
+    192.168.5.131:
+      name: Lounge Colour 1
+    192.168.5.130:
+      name: Lounge Colour 2
+    192.168.5.132:
+      name: Lounge Colour 3
+    192.168.5.133:
+      name: Lounge Colour 4
+    192.168.5.150:
+      name: Lounge Colour 5
+    192.168.5.149:
+      name: Lounge Colour 6
+    192.168.5.148:
+      name: Lounge Colour 7
+    192.168.5.135:
+      name: Strip
+    192.168.5.47:
+      name: Bedroom Colour
+
+light:
+  - platform: group
+    name: Lounge Lights
+    entities:
+      - light.lounge_colour_1
+      - light.lounge_colour_2
+      - light.lounge_colour_3
+      - light.lounge_colour_4
+      - light.lounge_colour_5
+      - light.lounge_colour_6
+      - light.lounge_colour_7
+  - platform: group
+    name: Outside Lights
+    entities:
+      - light.front
+      - light.carport
+  - platform: group
+    name: Bedroom Lights
+    entities:
+      - light.bedroom
+      - light.strip
+  - platform: group
+    name: Workshop Lights
+    entities:
+      - light.workshop_1
+      - light.workshop_2
+      - light.gateway_light_34ce008bed8d
+  - platform: mqtt
+    schema: json
+    name: Fast LED White
+    state_topic: "corbin/fastledwhite"
+    command_topic: "corbin/fastledwhite/set"
+    brightness: true
+    rgb: true
+    effect: true
+    effect_list:
+      - bpm
+      - candy cane
+      - confetti
+      # - cyclon rainbow
+      - dots
+      - fire
+      - glitter
+      - juggle
+      - lightning
+      - noise
+      - police all
+      - police one
+      - rainbow
+      - rainbow with glitter
+      - ripple
+      - sinelon
+      - solid
+      - twinkle
+
+
+camera:
+  - platform: mjpeg
+    mjpeg_url: http://192.168.5.215/Streaming/Channels/2/preview
+    still_image_url: http://192.168.5.215/Streaming/channels/1/picture?
+    name: Live Front Door
+    username: admin
+    password: !secret hikvision_password
+  - platform: mjpeg
+    mjpeg_url: http://192.168.5.213/Streaming/Channels/2/preview
+    still_image_url: http://192.168.5.213/Streaming/channels/1/picture?
+    name: Live Carport
+    username: admin
+    password: !secret hikvision_password
+  - platform: mjpeg
+    mjpeg_url: http://192.168.5.219/Streaming/Channels/2/preview
+    still_image_url: http://192.168.5.219/Streaming/channels/1/picture?
+    name: Live Driveway
+    username: admin
+    password: !secret hikvision_password2
+  - platform: mjpeg
+    mjpeg_url: http://192.168.5.210/Streaming/Channels/2/preview
+    still_image_url: http://192.168.5.210/Streaming/channels/1/picture?
+    name: Live Backyard
+    username: admin
+    password: !secret hikvision_password
+  - platform: mjpeg
+    mjpeg_url: http://192.168.5.216/Streaming/Channels/2/preview
+    still_image_url: http://192.168.5.216/Streaming/channels/1/picture?
+    name: Live Pool
+    username: admin
+    password: !secret hikvision_password
+  - platform: local_file
+    file_path: '/share/snapshot_carport.jpg'
+    name: Last Motion Carport
+  - platform: local_file
+    file_path: '/share/snapshot_front_door.jpg'
+    name: Last Motion Front
+#  - platform: ffmpeg
+#    input: -rtsp_transport tcp -i rtsp://192.168.5.170/unicast
+#    name: Live Pests
+
+mikrotik:
+  - host: 192.168.5.253
+    username: admin
+    password: !secret mikrotik_password
+
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml

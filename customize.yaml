@@ -1,0 +1,119 @@
+switch.Plug_158d00010ad681:
+  friendly_name: Google Home Power
+  google_assistant: false
+switch.Plug_158d00010e080c:
+  friendly_name: Workshop Power
+switch.Plug_158d00010ec40b:
+  friendly_name: Projector Power
+  google_assistant: false
+switch.Plug_158d00010ec4b1:
+  friendly_name: Yeelight LED Strip Power
+switch.Plug_158d00010ec4b3:
+  friendly_name: 'NBN Modem' #White LED Power
+switch.Plug_158d00010f8a88:
+  friendly_name: Vacuum Power
+switch.Plug_158d00011070b4:
+  friendly_name: Bedroom Fan
+switch.Plug_158d00013e2383:
+  friendly_name: Mi Box Power
+binary_sensor.door_window_sensor_158d000105b538:
+  friendly_name: Xiaomi Door Back Slide
+  device_class: door
+binary_sensor.door_window_sensor_158d0001102269:
+  friendly_name: Xiaomi Door Toilet
+  device_class: door
+binary_sensor.door_window_sensor_158d000111eed3:
+  friendly_name: Xiaomi Door Front Bedroom
+  device_class: door
+binary_sensor.door_window_sensor_158d00014e0538:
+  friendly_name: Xiaomi Door Front
+  device_class: door
+binary_sensor.door_window_sensor_158d000153725c:
+  friendly_name: Xiaomi Door Front Slide
+  device_class: door
+binary_sensor.door_window_sensor_158d0001584059:
+  friendly_name: Xiaomi Door Office
+  device_class: door
+binary_sensor.door_window_sensor_158d00015842c3:
+  friendly_name: Xiaomi Door Bedroom
+  device_class: door
+binary_sensor.door_window_sensor_158d00016d6e9b:
+  friendly_name: Xiaomi Door Workshop
+  device_class: door
+binary_sensor.door_window_sensor_158d0001a3e783:
+  friendly_name: Xiaomi Door Bathroom
+  device_class: door
+binary_sensor.motion_sensor_158d0000fa3efe:
+  friendly_name: Xiaomi Motion Bikes
+binary_sensor.motion_sensor_158d0000fd32c2:
+  friendly_name: Xiaomi Motion Toilet
+binary_sensor.motion_sensor_158d000103daee:
+  friendly_name: Xiaomi Motion Front Bedroom
+binary_sensor.motion_sensor_158d00010ab435:
+  friendly_name: Xiaomi Motion Kitchen
+binary_sensor.motion_sensor_158d00011c01ff:
+  friendly_name: Motion Front Xiaomi
+binary_sensor.motion_sensor_158d000122febd:
+  friendly_name: Motion Carport 2018
+binary_sensor.motion_sensor_158d0001292748:
+  friendly_name: Xiaomi Motion Hallway
+binary_sensor.motion_sensor_158d00012932cf:
+  friendly_name: Xiaomi Motion Workshop
+binary_sensor.motion_sensor_158d0001548b54:
+  friendly_name: Xiaomi Motion Bedroom
+binary_sensor.motion_sensor_158d0001d5c8fc:
+  friendly_name: Xiaomi Motion Front Aqara
+binary_sensor.motion_sensor_158d0001d66c02:
+  friendly_name: Xiaomi Motion Verandah
+binary_sensor.smoke_sensor_158d0001536526:
+  friendly_name: Xiaomi Smoke
+binary_sensor.switch_158d0000f92ff5:
+  friendly_name: Xiaomi Switch 1
+binary_sensor.switch_158d0000fa61de:
+  friendly_name: Xiaomi Switch 2
+binary_sensor.switch_158d000104ed67:
+  friendly_name: Xiaomi Switch 3
+binary_sensor.wall_switch_158d0001831a9a:
+  friendly_name: Xiaomi Wall Switch
+binary_sensor.wall_switch_both_158d000183d3b7:
+  friendly_name: Wall Switch (Both)
+binary_sensor.wall_switch_left_158d000183d3b7:
+  friendly_name: Wall Switch (Left)
+binary_sensor.wall_switch_right_158d000183d3b7:
+  friendly_name: Wall Switch (Right)
+sensor.illumination_f0b4299ae4b8:
+  friendly_name: Gateway Lux 1
+sensor.illumination_34ce008bed8d:
+  friendly_name: Gateway Lux 2
+sensor.illumination_158d0001d5c8fc:
+  friendly_name: Aqara Front Lux
+light.gateway_light_34ce008bed8d:
+  friendly_name: Gateway Light 2
+light.gateway_light_f0b4299ae4b8:
+  friendly_name: Gateway Light 1
+binary_sensor.motion_and_repeater_node_22_1:
+  friendly_name: MySensors Kitchen
+binary_sensor.sensebender_micro_4_1:
+  friendly_name: MySensors Varandah
+binary_sensor.motion_pm_frontdoor_19_1:
+  friendly_name: MySensors Front
+sensor.temperature_158d000273c264:
+  friendly_name: Basement Temperature
+sensor.humidity_158d000273c264:
+  friendly_name: Basement Humidity
+binary_sensor.vibration_158d0002b123bc:
+  friendly_name: Bedroom Vibration
+device_tracker.mibox3:
+  hidden: true
+device_tracker.plt_bbtgo2:
+  hidden: true
+device_tracker.04b16746f886:
+  friendly_name: Corbin A1 WiFi
+#device_tracker.mi_a1:
+#  friendly_name: Corbin A1 BT
+camera.backyard:
+  order: 1
+camera.carport:
+  order: 2
+group.all_automations:
+  hidden: false
